@@ -1,0 +1,32 @@
+name: Superheavy setup
+description: Give git-lfs access to the repository's Superheavy LFS storage with the job's GitHub OIDC token.
+author: Superheavy
+inputs:
+  path:
+    description: Path of the repository's working tree, relative to the workspace.
+    default: "."
+  url:
+    description: Superheavy LFS URL. Defaults to lfs.url in the repository's .lfsconfig.
+    required: false
+  pull:
+    description: Run git lfs pull after setup.
+    default: "true"
+  audience:
+    description: OIDC audience that the Superheavy server accepts.
+    default: superheavy.dev
+  cache:
+    description: Keep the checkout's LFS objects in the Actions cache, so later runs download only objects the cache lacks.
+    default: "true"
+  telemetry:
+    description: Send Superheavy a report of the run's step timings and per-object download times, without file names or object ids. SUPERHEAVY_TELEMETRY=0 or DO_NOT_TRACK=1 in the job's environment also turns it off.
+    default: "true"
+outputs:
+  scope:
+    description: read or write, the access the job has to the repository.
+  cache-hits:
+    description: LFS objects of the checkout that were on the runner or in the Actions cache.
+  cache-misses:
+    description: LFS objects of the checkout that git-lfs downloaded.
+runs:
+  using: node24
+  main: dist/main.js
