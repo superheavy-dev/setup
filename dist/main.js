@@ -89524,7 +89524,7 @@ password=${token}
 `);
   } catch (error63) {
     process.stderr.write(
-      `superheavy/setup: ${error63 instanceof Error ? error63.message : String(error63)}
+      `superheavy-dev/setup: ${error63 instanceof Error ? error63.message : String(error63)}
 `
     );
     process.exitCode = 1;
@@ -89537,7 +89537,7 @@ import { writeFileSync as writeFileSync3 } from "node:fs";
 // package.json
 var package_default = {
   name: "@superheavy/action",
-  version: "1.0.0",
+  version: "1.0.1",
   private: true,
   type: "module",
   scripts: {
@@ -89686,6 +89686,15 @@ function lfsConfigUrl(repository) {
     `${resolve4(repository, ".lfsconfig")} has no lfs.url. Enable the repository on Superheavy, or set the url input.`
   );
 }
+function headSetsLfsUrl(repository) {
+  return git2(repository, [
+    "config",
+    "--blob",
+    "HEAD:.lfsconfig",
+    "--get-regexp",
+    "^(lfs\\.url|remote\\.origin\\.lfsurl)$"
+  ]) !== void 0;
+}
 var LOOPBACK = /* @__PURE__ */ new Set(["127.0.0.1", "localhost", "[::1]"]);
 function onSuperheavy({ protocol, hostname: hostname3 }) {
   return protocol === "https:" && (hostname3 === "superheavy.dev" || hostname3.endsWith(".superheavy.dev"));
@@ -89787,6 +89796,11 @@ async function main() {
     process.env["GITHUB_WORKSPACE"] ?? process.cwd(),
     input2("path") || "."
   );
+  if (!headSetsLfsUrl(repository)) {
+    console.log(
+      "::warning::This branch's .lfsconfig doesn't set lfs.url, so GitHub rejects pushes that add LFS files (GH008). Commit a .lfsconfig with lfs.url to this branch, for example a copy of the default branch's."
+    );
+  }
   const { url: url3, defaultBranch } = lfsUrl(repository, input2("url"));
   if (defaultBranch !== void 0) {
     console.log(

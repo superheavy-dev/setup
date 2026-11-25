@@ -14,6 +14,8 @@ steps:
 
 The action reads the LFS URL from `.lfsconfig`, or from `.lfsconfig` on origin's default branch when the checkout has none, configures git-lfs for the rest of the job, and runs `git lfs pull`. Later steps can run `git lfs push`, `git lfs fetch` or `git lfs lock` with no extra setup.
 
+GitHub rejects pushes that add LFS files to a branch whose committed `.lfsconfig` sets neither `lfs.url` nor `remote.origin.lfsurl` (error GH008). The action warns in the job log when the checked-out commit's `.lfsconfig` sets neither. To fix it, commit a `.lfsconfig` with `lfs.url` to that branch, for example a copy of the default branch's.
+
 The action keeps the checkout's LFS objects in the Actions cache. A later run of the same commit downloads nothing, and a run of a later commit downloads only the objects that changed. Each object restored from the cache must match its oid, and git-lfs downloads any object that doesn't.
 
 Jobs started by `push`, `workflow_dispatch`, `schedule`, `merge_group`, `release` and `repository_dispatch` can upload. Jobs started by any other event, pull requests included, can only download.
